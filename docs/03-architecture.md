@@ -2,7 +2,7 @@
 
 ## 1. Общая схема
 
-Диаграмма: [04-system-architecture.puml](../diagrams/04-system-architecture.puml)
+Диаграмма: [04-system-architecture.png](../diagrams/04-system-architecture.png)
 
 Система состоит из четырех уровней:
 

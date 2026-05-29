@@ -116,25 +116,25 @@ ML дает ценность не из-за «замены охранника к
 ### Бизнес-процессы
 
 - [Описание бизнес-процессов до и после внедрения](docs/01-business-processes.md)
-- [BPMN-style AS-IS: ручной контроль доступа](diagrams/01-bpmn-as-is.puml)
-- [BPMN-style TO-BE: автоматизированный контроль доступа](diagrams/02-bpmn-to-be.puml)
+- [BPMN-style AS-IS: ручной контроль доступа](diagrams/01-bpmn-as-is.png)
+- [BPMN-style TO-BE: автоматизированный контроль доступа](diagrams/02-bpmn-to-be.png)
 
 ### Данные
 
 - [Структура данных и распределенное хранение](docs/02-data-model.md)
-- [ER-диаграмма данных](diagrams/03-er-data-model.puml)
+- [ER-диаграмма данных](diagrams/03-er-data-model.png)
 
 ### Архитектура
 
 - [Архитектура production-системы](docs/03-architecture.md)
-- [Диаграмма архитектуры системы](diagrams/04-system-architecture.puml)
-- [UML-диаграмма компонентов](diagrams/05-uml-components.puml)
+- [Диаграмма архитектуры системы](diagrams/04-system-architecture.png)
+- [UML-диаграмма компонентов](diagrams/05-uml-components.png)
 
 ### Поведение системы
 
 - [MLSD: методология, пилот, MVP, production](docs/04-mlsd.md)
-- [UML sequence: попытка прохода через КПП](diagrams/06-uml-sequence-access.puml)
-- [UML activity: регистрация биометрии сотрудника](diagrams/07-uml-activity-enrollment.puml)
+- [UML sequence: попытка прохода через КПП](diagrams/06-uml-sequence-access.png)
+- [UML activity: регистрация биометрии сотрудника](diagrams/07-uml-activity-enrollment.png)
 
 ### Риски и безопасность
 
@@ -246,7 +246,7 @@ RGB+IR+Depth Terminal -> Edge Inference Node -> Access Decision API -> СКУД 
                          Central Template Vault / Event Log / Monitoring
 ```
 
-Подробнее см. [архитектурный документ](docs/03-architecture.md) и [диаграмму архитектуры](diagrams/04-system-architecture.puml).
+Подробнее см. [архитектурный документ](docs/03-architecture.md) и [диаграмму архитектуры](diagrams/04-system-architecture.png).
 
 ---
 

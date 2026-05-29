@@ -13,7 +13,7 @@
 | Модели ML и конфигурации | Model Registry + object storage | Версионирование, откат, reproducibility |
 | Edge-кэш на КПП | Локальная БД/embedded storage | Работа при кратковременной потере связи |
 
-ER-диаграмма: [03-er-data-model.puml](../diagrams/03-er-data-model.puml)
+ER-диаграмма: [03-er-data-model.png](../diagrams/03-er-data-model.png)
 
 ---
 

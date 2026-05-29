@@ -6,13 +6,13 @@
 
 | Файл | Тип | Назначение |
 |---|---|---|
-| [01-bpmn-as-is.puml](../diagrams/01-bpmn-as-is.puml) | BPMN-style activity | Процесс ручной проверки до внедрения |
-| [02-bpmn-to-be.puml](../diagrams/02-bpmn-to-be.puml) | BPMN-style activity | Процесс автоматизированной проверки после внедрения |
-| [03-er-data-model.puml](../diagrams/03-er-data-model.puml) | ER diagram | Структура данных |
-| [04-system-architecture.puml](../diagrams/04-system-architecture.puml) | Architecture diagram | Распределенная архитектура |
-| [05-uml-components.puml](../diagrams/05-uml-components.puml) | UML component | Компоненты системы и зависимости |
-| [06-uml-sequence-access.puml](../diagrams/06-uml-sequence-access.puml) | UML sequence | Сценарий попытки прохода |
-| [07-uml-activity-enrollment.puml](../diagrams/07-uml-activity-enrollment.puml) | UML activity | Регистрация биометрии сотрудника |
+| [01-bpmn-as-is.png](../diagrams/01-bpmn-as-is.png) | BPMN-style activity | Процесс ручной проверки до внедрения |
+| [02-bpmn-to-be.png](../diagrams/02-bpmn-to-be.png) | BPMN-style activity | Процесс автоматизированной проверки после внедрения |
+| [03-er-data-model.png](../diagrams/03-er-data-model.png) | ER diagram | Структура данных |
+| [04-system-architecture.png](../diagrams/04-system-architecture.png) | Architecture diagram | Распределенная архитектура |
+| [05-uml-components.png](../diagrams/05-uml-components.png) | UML component | Компоненты системы и зависимости |
+| [06-uml-sequence-access.png](../diagrams/06-uml-sequence-access.png) | UML sequence | Сценарий попытки прохода |
+| [07-uml-activity-enrollment.png](../diagrams/07-uml-activity-enrollment.png) | UML activity | Регистрация биометрии сотрудника |
 
 ## 2. Генерация PNG/SVG
 
