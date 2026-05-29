@@ -1,0 +1,91 @@
+@startuml
+title UML Component Diagram: компоненты системы
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+
+package "Checkpoint Layer" {
+  [Biometric Terminal App] as terminal
+  [Device Adapter] as adapter
+  [Edge Inference Service] as edge
+  [Local Template Cache] as cache
+}
+
+package "ML Components" {
+  [Face Detector] as facedetector
+  [Face Embedding Model] as facemodel
+  [Liveness/PAD Model] as padmodel
+  [Quality Assessment] as quality
+}
+
+package "Backend Services" {
+  [Access Decision API] as decision
+  [Employee Service] as employee
+  [Access Rights Service] as rights
+  [Biometric Template Service] as template
+  [Audit Event Service] as audit
+  [Device Management Service] as device
+  [Operator Console Backend] as console
+  [Model Registry] as registry
+}
+
+package "External Systems" {
+  [СКУД / ACS] as acs
+  [HR System] as hr
+  [SIEM] as siem
+}
+
+database "PostgreSQL" as pg
+database "Encrypted Template Vault" as vault
+database "Event Storage" as eventstore
+database "Object Storage" as objectstore
+
+interface "Capture API" as Icapture
+interface "Decision API" as Idecision
+interface "Template Sync API" as ItemplateSync
+interface "ACS Command API" as Iacs
+interface "Audit API" as Iaudit
+
+terminal - Icapture
+Icapture - adapter
+adapter --> edge
+
+edge --> quality
+edge --> facedetector
+edge --> facemodel
+edge --> padmodel
+edge --> cache
+edge - Idecision
+Idecision - decision
+
+decision --> employee
+decision --> rights
+decision - Iacs
+Iacs - acs
+decision - Iaudit
+Iaudit - audit
+
+template --> vault
+template - ItemplateSync
+ItemplateSync - cache
+
+employee --> pg
+rights --> pg
+device --> pg
+audit --> eventstore
+audit --> pg
+audit --> siem
+
+console --> audit
+console --> decision
+console --> device
+
+hr --> employee : employee status sync
+registry --> objectstore
+registry --> edge : model/config rollout
+facemodel ..> registry : versioned artifact
+padmodel ..> registry : versioned artifact
+
+@enduml
+

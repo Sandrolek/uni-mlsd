@@ -1,0 +1,84 @@
+@startuml
+title Архитектура ML-системы контроля доступа
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+
+actor "Сотрудник" as employee
+actor "Дежурный КПП" as guard
+actor "Администратор безопасности" as secadmin
+actor "ML/Data Engineer" as mleng
+
+node "КПП #1..#10" as checkpoint {
+  component "RGB+IR+Depth\nBiometric Terminal" as terminal
+  component "Turnstile / Door\nController" as turnstile
+  node "Edge Inference Node" as edge {
+    component "Capture Quality\nService" as quality
+    component "Liveness / PAD\nInference" as pad
+    component "Face Embedding\nInference" as embedding
+    database "Local Template\nCache" as localcache
+    queue "Offline Event\nBuffer" as buffer
+  }
+}
+
+cloud "Central Kubernetes Cluster" as k8s {
+  component "Access Decision API" as decision
+  component "Employee & Access\nRights Service" as rights
+  component "Biometric Template\nService" as templates
+  component "Device Management\nService" as devices
+  component "Audit / Event\nService" as audit
+  component "Operator Console\nBackend" as console
+  component "Model Deployment\nService" as deploy
+}
+
+database "PostgreSQL\nEmployees, devices, rules" as pg
+database "Encrypted Template Vault\n+ Vector Index" as vault
+database "Event Storage\nAccess logs" as events
+database "Object Storage\nShort TTL captures,\nmodel artifacts" as obj
+database "Monitoring\nMetrics/logs/traces" as mon
+component "СКУД / ACS" as acs
+component "HR System" as hr
+component "SIEM" as siem
+
+employee --> terminal : face presentation
+terminal --> edge : RGB + IR + depth
+edge --> decision : match/liveness scores
+decision --> rights : access rules
+decision --> acs : allow / deny
+acs --> turnstile : open / keep closed
+
+decision --> audit : decision event
+audit --> events : append
+edge --> buffer : store if offline
+buffer --> audit : replay events
+
+templates --> vault : read/write templates
+templates --> localcache : encrypted sync
+rights --> pg
+devices --> pg
+audit --> pg
+audit --> events
+console --> audit
+console --> decision : manual override
+guard --> console : review exceptions
+
+deploy --> edge : signed model/config rollout
+deploy --> obj : model artifacts
+mleng --> deploy
+secadmin --> devices
+hr --> rights : employee status/access group
+audit --> siem : security events
+k8s --> mon : metrics/logs
+edge --> mon : health/latency/PAD stats
+
+legend right
+  Распределенный характер:
+  - 10 КПП имеют локальные edge-узлы
+  - шаблоны централизованы, но кэшируются на edge
+  - события рождаются на КПП и реплицируются в центр
+  - raw captures хранятся отдельно и короткое время
+endlegend
+
+@enduml
+

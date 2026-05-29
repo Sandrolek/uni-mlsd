@@ -1,0 +1,77 @@
+@startuml
+title TO-BE: автоматизированный контроль доступа с 3D-биометрией и liveness/PAD
+
+skinparam shadowing false
+skinparam ActivityBorderColor #333333
+skinparam ActivityBackgroundColor #F8F8F8
+skinparam ArrowColor #333333
+
+|Сотрудник|
+start
+:Подходит к биометрическому терминалу;
+
+|RGB+IR+Depth терминал|
+:Захватывает RGB-кадр;
+:Захватывает IR-кадр;
+:Строит карту глубины лица;
+:Проверяет базовое качество кадра;
+
+if (Качество кадра достаточное?) then (да)
+  |Edge Inference Node|
+  :Выполняет liveness/PAD;
+  if (Живое лицо подтверждено?) then (да)
+    :Строит face embedding;
+    :Ищет кандидата в локальном/центральном индексе;
+    :Передает scores и candidate_employee_id;
+
+    |Access Decision API|
+    :Проверяет статус сотрудника;
+    :Проверяет права доступа;
+    :Проверяет checkpoint/time rules;
+
+    if (Доступ разрешен?) then (да)
+      |СКУД|
+      :Открывает турникет;
+      :Фиксирует успешное событие;
+      |Сотрудник|
+      :Проходит на территорию;
+    else (нет / серая зона)
+      |Рабочее место дежурного|
+      :Получает событие manual_review;
+      :Выполняет ручную проверку;
+      if (Дежурный разрешил?) then (да)
+        |СКУД|
+        :Открывает турникет;
+        :Логирует operator_override;
+      else (нет)
+        |СКУД|
+        :Фиксирует отказ;
+      endif
+    endif
+
+  else (нет)
+    |Access Decision API|
+    :Формирует отказ PAD_FAILED;
+    |СКУД|
+    :Не открывает турникет;
+    :Логирует подозрение на spoofing;
+  endif
+
+else (нет)
+  |Рабочее место дежурного|
+  :Получает событие BAD_CAPTURE_QUALITY;
+  :Ручная проверка или повторная попытка;
+endif
+
+stop
+
+legend right
+  Изменение TO-BE:
+  - автоматическое решение вместо визуальной проверки
+  - depth/liveness защищает от фото и видео
+  - edge снижает latency
+  - все события аудируются
+endlegend
+
+@enduml
+

@@ -1,0 +1,61 @@
+@startuml
+title UML Sequence: попытка прохода через КПП
+
+actor "Сотрудник" as Emp
+participant "RGB+IR+Depth\nTerminal" as Term
+participant "Edge Inference\nNode" as Edge
+participant "Local Template\nCache" as Cache
+participant "Access Decision\nAPI" as Decision
+participant "Access Rights\nService" as Rights
+participant "Audit/Event\nService" as Audit
+participant "СКУД / ACS" as ACS
+participant "Operator Console" as Console
+actor "Дежурный" as Guard
+
+Emp -> Term : Подходит к терминалу
+Term -> Term : Capture RGB + IR + depth
+Term -> Edge : Передает capture package
+Edge -> Edge : Quality assessment
+
+alt Плохое качество кадра
+  Edge -> Decision : result=BAD_CAPTURE_QUALITY
+  Decision -> Audit : log manual_review
+  Decision -> Console : create review task
+  Guard -> Console : ручная проверка
+  Console -> Decision : override allow/deny
+  Decision -> ACS : command based on override
+else Качество достаточное
+  Edge -> Edge : Liveness/PAD inference
+  alt PAD failed
+    Edge -> Decision : result=PAD_FAILED
+    Decision -> Audit : log deny + spoofing suspicion
+    Decision -> ACS : deny / keep closed
+  else PAD passed
+    Edge -> Edge : Face embedding inference
+    Edge -> Cache : 1:N candidate search
+    Cache --> Edge : candidate + match_score
+    Edge -> Decision : candidate, match_score, liveness_score
+    Decision -> Rights : check employee status/access rules
+    Rights --> Decision : allow/deny by policy
+
+    alt Уверенное совпадение и права есть
+      Decision -> ACS : open turnstile
+      Decision -> Audit : log allow
+      ACS --> Emp : проход разрешен
+    else Нет прав или сотрудник неактивен
+      Decision -> ACS : deny
+      Decision -> Audit : log deny
+      ACS --> Emp : проход запрещен
+    else Низкая уверенность / серая зона
+      Decision -> Audit : log manual_review
+      Decision -> Console : create review task
+      Guard -> Console : ручная проверка
+      Console -> Decision : override allow/deny
+      Decision -> ACS : command based on override
+      Decision -> Audit : log operator_override
+    end
+  end
+end
+
+@enduml
+

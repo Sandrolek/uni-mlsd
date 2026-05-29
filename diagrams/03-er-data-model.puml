@@ -1,0 +1,148 @@
+@startuml
+title ER-диаграмма данных системы биометрического контроля доступа
+
+hide circle
+skinparam linetype ortho
+
+entity "employee" as employee {
+  * employee_id : uuid <<PK>>
+  --
+  personnel_number : varchar <<UNIQUE>>
+  full_name : varchar
+  department : varchar
+  employment_status : enum
+  access_group_id : uuid <<FK>>
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "access_group" as access_group {
+  * access_group_id : uuid <<PK>>
+  --
+  name : varchar
+  description : text
+  created_at : timestamp
+}
+
+entity "checkpoint" as checkpoint {
+  * checkpoint_id : uuid <<PK>>
+  --
+  name : varchar
+  location : varchar
+  security_level : int
+  status : enum
+}
+
+entity "device" as device {
+  * device_id : uuid <<PK>>
+  --
+  checkpoint_id : uuid <<FK>>
+  device_type : enum
+  vendor : varchar
+  serial_number : varchar
+  firmware_version : varchar
+  last_seen_at : timestamp
+  status : enum
+}
+
+entity "model_version" as model_version {
+  * model_version_id : uuid <<PK>>
+  --
+  face_model_name : varchar
+  pad_model_name : varchar
+  artifact_uri : varchar
+  threshold_config : jsonb
+  status : enum
+  created_at : timestamp
+  deployed_at : timestamp
+}
+
+entity "biometric_template" as biometric_template {
+  * template_id : uuid <<PK>>
+  --
+  employee_id : uuid <<FK>>
+  model_version_id : uuid <<FK>>
+  template_version : int
+  encrypted_embedding_ref : varchar
+  quality_score : decimal
+  enrollment_device_id : uuid <<FK>>
+  status : enum
+  created_at : timestamp
+  revoked_at : timestamp
+}
+
+entity "enrollment_session" as enrollment_session {
+  * enrollment_session_id : uuid <<PK>>
+  --
+  employee_id : uuid <<FK>>
+  operator_id : uuid <<FK>>
+  device_id : uuid <<FK>>
+  status : enum
+  quality_score : decimal
+  started_at : timestamp
+  completed_at : timestamp
+  failure_reason : varchar
+}
+
+entity "access_event" as access_event {
+  * event_id : uuid <<PK>>
+  --
+  checkpoint_id : uuid <<FK>>
+  device_id : uuid <<FK>>
+  candidate_employee_id : uuid <<FK nullable>>
+  model_version_id : uuid <<FK>>
+  decision : enum
+  reason_code : varchar
+  match_score : decimal
+  liveness_score : decimal
+  depth_quality_score : decimal
+  created_at : timestamp
+}
+
+entity "operator" as operator {
+  * operator_id : uuid <<PK>>
+  --
+  login : varchar
+  full_name : varchar
+  role : enum
+  status : enum
+}
+
+entity "operator_override" as operator_override {
+  * override_id : uuid <<PK>>
+  --
+  event_id : uuid <<FK>>
+  operator_id : uuid <<FK>>
+  decision : enum
+  comment : text
+  created_at : timestamp
+}
+
+entity "access_rule" as access_rule {
+  * access_rule_id : uuid <<PK>>
+  --
+  access_group_id : uuid <<FK>>
+  checkpoint_id : uuid <<FK>>
+  schedule : jsonb
+  effect : enum
+  created_at : timestamp
+}
+
+access_group ||--o{ employee : includes
+access_group ||--o{ access_rule : defines
+checkpoint ||--o{ access_rule : applies_to
+checkpoint ||--o{ device : contains
+employee ||--o{ biometric_template : has
+employee ||--o{ enrollment_session : enrolls
+device ||--o{ enrollment_session : performs
+operator ||--o{ enrollment_session : supervises
+model_version ||--o{ biometric_template : creates
+checkpoint ||--o{ access_event : records
+device ||--o{ access_event : captures
+employee ||--o{ access_event : candidate
+model_version ||--o{ access_event : used_by
+access_event ||--o| operator_override : may_have
+operator ||--o{ operator_override : decides
+
+@enduml
+
