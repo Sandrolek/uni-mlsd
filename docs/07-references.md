@@ -16,7 +16,9 @@
 - Apple Face ID / TrueDepth как пример consumer-grade подхода с depth map и IR:  
   https://support.apple.com/en-us/102381
 
+
 ## Privacy / compliance
+
 
 - GDPR, Article 9 — special categories of personal data, включая biometric data for uniquely identifying a natural person:  
   https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX%3A02016R0679-20160504
